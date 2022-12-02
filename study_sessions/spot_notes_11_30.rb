@@ -33,3 +33,8 @@ We initialize a local variable `array` to the return value of invoking `map` on 
 
 
 =end
+
+
+=begin
+
+# on line 8 we invoke the array getter method on the array referenced by `arr` and pass in `counter` as a argument which returns the element at the index location for the integer referenced by `counter` and addes that values to the current value referenced by `sum`
