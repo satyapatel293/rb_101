@@ -1,13 +1,11 @@
 def initalize_deck
   values = %w(2 3 4 5 6 7 8 9 10 J Q K A)
   suits = %w(H D S C)
-  suits.product(values)
+  suits.product(values).shuffle
 end
 
-def draw_card(deck)
-  card = deck.sample
-  deck.delete(card)
-  card
+def draw_card!(deck)
+  card = deck.shift
 end
 
 def calculate_total(cards)
@@ -34,7 +32,7 @@ end
 
 def deal_cards(deck, player, dealer)
   [player, dealer].each do |turn|
-    2.times { |_| turn << draw_card(deck) }
+    2.times { |_| turn << draw_card!(deck) }
   end
 end
 
@@ -79,6 +77,51 @@ def compare_totals(player_score, dealer_score)
   end
 end
 
+def hit_or_stay
+  answer = nil 
+  loop do 
+    puts 'hit or stay'
+    answer = gets.chomp
+    break if %w(hit stay).include?(answer)  
+    puts 'Please enter'
+  end  
+  answer
+end
+
+def detect_winner(player_total, dealer_total)
+  if player_total > 21 
+    :player_bust
+  elsif dealer_total > 21
+    :dealer_bust
+  elsif player_total > dealer_total
+    :player_win
+  elsif dealer_total > player_total
+    :dealer_win
+  else 
+    :tie
+  end 
+end 
+
+def play_again #TODO this will alway produce true in current state
+  puts 'Would you like to play again?'
+  puts 'yes or no?'
+  answer = gets.chomp
+  !!answer
+end 
+
+def display_winner(player_total, dealer_total)
+  result = detect_winner(player_total, dealer_total)
+  case result
+  when :player_bust then puts "DEALER WINS! Player busted"
+  when :dealer_bust then puts "PLAYER WINS! Dealer busted"
+  when :player_win then puts'Player beats dealer!'
+  when :dealer_win then puts 'Dealer beats player!'
+  else puts "Tie Game!"
+  end 
+  sleep(3)
+end 
+
+
 loop do
   player = []
   dealer = []
@@ -92,30 +135,26 @@ loop do
 
   loop do
     loop do
-      puts 'hit or stay'
-      answer = gets.chomp
-      break if answer == "stay"
-      player << draw_card(deck)
+      answer = hit_or_stay
+      break if answer == 'stay'
+      player << draw_card!(deck)
       player_score = calculate_total(player)
       display_table(player, dealer)
       break if busted?(player_score)
     end
-    break winner = "dealer" if busted?(player_score)
+
+    if busted?(player_score)
+      display_winner(player_score, dealer_score)
+      # play_again ? next : break
+    end 
 
     loop do
       break if dealer_score >= 17 || busted?(dealer_score)
-      dealer << draw_card(deck)
+      dealer << draw_card!(deck)
       dealer_score = calculate_total(dealer)
     end
-    break winner = "player" if busted?(dealer_score)
 
-    winner = compare_totals(player_score, dealer_score)
-    break
+    display_winner(player_score, dealer_score)
+    # play_again ? next : break
   end
-
-  system 'clear'
-  puts "player #{player_score}"
-  puts "dealer #{dealer_score}"
-  puts "#{winner} WINS!!!!!!"
-  sleep(3)
 end

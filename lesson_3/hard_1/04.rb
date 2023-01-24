@@ -3,7 +3,7 @@ def dot_separated_ip_address?(input_string)
   if dot_separated_words.length == 4 
     while dot_separated_words.size > 0 do
       word = dot_separated_words.pop
-      break unless is_an_ip_number?(word)
+      return false unless is_an_ip_number?(word)
     end 
   else 
     return false
